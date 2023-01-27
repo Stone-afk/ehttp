@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 	"time"
@@ -24,7 +25,7 @@ func LoginMiddleware() web.Middleware {
 					return
 				}
 				// 每次收到一个请求都刷新
-				ctx.Set("sess", sess)
+				ctx.UserValues["sess"] = sess
 				_ = m.Refresh(ctx.Request.Context(), sess.ID())
 				next(ctx)
 			}
@@ -78,5 +79,6 @@ func TestManager(t *testing.T) {
 		_ = m.RemoveSession(ctx)
 	})
 
-	s.Start(":8081")
+	err := s.Start(":8081")
+	assert.Nil(t, err)
 }
