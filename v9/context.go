@@ -90,6 +90,13 @@ func (ctx *Context) BindJSONOpt(val any, useNumber bool, disallowUnknown bool) e
 	return decoder.Decode(val)
 }
 
+func (s StringValue) ToUInt64() (uint64, error) {
+	if s.err != nil {
+		return 0, s.err
+	}
+	return strconv.ParseUint(s.val, 10, 64)
+}
+
 func (s StringValue) ToInt64() (int64, error) {
 	if s.err != nil {
 		return 0, s.err
@@ -134,4 +141,10 @@ type Context struct {
 
 	// 页面渲染的引擎
 	tplEngine TemplateEngine
+
+	// 用户可以自由决定在这里存储什么，
+	// 主要用于解决在不同 Middleware 之间数据传递的问题
+	// 但是要注意
+	// 1. UserValues 在初始状态的时候总是 nil，你需要自己手动初始化
+	UserValues map[string]any
 }

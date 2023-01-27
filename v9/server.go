@@ -18,7 +18,7 @@ func (s *HTTPServer) Get(path string, handleFunc HandleFunc, mdls ...Middleware)
 	s.addRoute(http.MethodGet, path, handleFunc, mdls...)
 }
 
-// UseV1 会执行路由匹配，只有匹配上了的 mdls 才会生效
+// UseMdls 会执行路由匹配，只有匹配上了的 mdls 才会生效
 // 这个只需要稍微改造一下路由树就可以实现
 func (s *HTTPServer) UseMdls(method string, path string, mdls ...Middleware) {
 	s.addRoute(method, path, nil, mdls...)
@@ -112,7 +112,7 @@ func (s *HTTPServer) Start(addr string) error {
 
 }
 
-// 因为渲染页面是一种个性需求，所以我们做成 Option 模式， 需要的用户自己注入 TemplateEngine。
+// ServerWithTemplateEngine 因为渲染页面是一种个性需求，所以我们做成 Option 模式， 需要的用户自己注入 TemplateEngine。
 func ServerWithTemplateEngine(engine TemplateEngine) ServerOption {
 	return func(server *HTTPServer) {
 		server.TplEngine = engine

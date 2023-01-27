@@ -100,7 +100,7 @@ func TestServerWithRenderEngine(t *testing.T) {
 
 	s := NewHTTPServer(ServerWithTemplateEngine(&GoTemplateEngine{}))
 
-	err := s.tplEngine.LoadFromGlob("testdata/tpls/*.gohtml")
+	err := s.TplEngine.LoadFromGlob("testdata/tpls/*.gohtml")
 	if err != nil {
 		t.Fatal(err)
 	}
