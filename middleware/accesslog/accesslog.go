@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	web "web/v8"
+	"web/context"
+	webHandler "web/handler"
+	"web/middleware"
 )
 
-func (b *MiddlewareBuilder) Build() web.Middleware {
-	return func(next web.HandleFunc) web.HandleFunc {
-		return func(ctx *web.Context) {
+func (b *MiddlewareBuilder) Build() middleware.Middleware {
+	return func(next webHandler.HandleFunc) webHandler.HandleFunc {
+		return func(ctx *context.Context) {
 			defer func() {
 				body, err := ioutil.ReadAll(ctx.Request.Body)
 				if err == nil {

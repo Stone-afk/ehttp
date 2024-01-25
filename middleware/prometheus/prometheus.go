@@ -4,10 +4,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"strconv"
 	"time"
-	web "web/v8"
+	"web/context"
+	webHandler "web/handler"
+	"web/middleware"
 )
 
-func (m *MiddlewareBuilder) Build() web.Middleware {
+func (m *MiddlewareBuilder) Build() middleware.Middleware {
 	//  创建一个 Vector （向量）其实就是观察者，设置 ConstLabels 和 Labels
 	summaryVec := prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name:        m.Name,
@@ -17,8 +19,8 @@ func (m *MiddlewareBuilder) Build() web.Middleware {
 	}, []string{"pattern", "method", "status"})
 	// 记得调用 MustRegister 把观 察者注册进去。
 	prometheus.MustRegister(summaryVec)
-	return func(next web.HandleFunc) web.HandleFunc {
-		return func(ctx *web.Context) {
+	return func(next webHandler.HandleFunc) webHandler.HandleFunc {
+		return func(ctx *context.Context) {
 			startTime := time.Now()
 			next(ctx)
 			endTime := time.Now()
@@ -27,7 +29,7 @@ func (m *MiddlewareBuilder) Build() web.Middleware {
 	}
 }
 
-func report(dur time.Duration, ctx *web.Context, vec prometheus.ObserverVec) {
+func report(dur time.Duration, ctx *context.Context, vec prometheus.ObserverVec) {
 	status := ctx.RespStatusCode
 	route := "unknown"
 	if ctx.MatchedRoute != "" {

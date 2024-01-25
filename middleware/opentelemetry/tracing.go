@@ -5,7 +5,9 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
-	web "web/v7"
+	"web/context"
+	webHandler "web/handler"
+	"web/middleware"
 )
 
 const defaultInstrumentationName = "go/web/middle/opentelemetry"
@@ -18,13 +20,13 @@ func NewBuilder() *MiddlewareBuilder {
 	return &MiddlewareBuilder{}
 }
 
-func (b *MiddlewareBuilder) Build() web.Middleware {
+func (b *MiddlewareBuilder) Build() middleware.Middleware {
 	if b.Tracer == nil {
 		b.Tracer = otel.GetTracerProvider().Tracer(defaultInstrumentationName)
 	}
 	initZipkin()
-	return func(next web.HandleFunc) web.HandleFunc {
-		return func(ctx *web.Context) {
+	return func(next webHandler.HandleFunc) webHandler.HandleFunc {
+		return func(ctx *context.Context) {
 			// 为了和上游链路连在一起，也就是发起 HTTP 请求的客户端 (关联上下游)
 			reqCtx := ctx.Request.Context()
 			reqCtx = otel.GetTextMapPropagator().Extract(reqCtx,

@@ -3,12 +3,14 @@ package recovery
 import (
 	"log"
 	"net/http"
-	web "web/v9"
+	"web"
+	"web/context"
+	"web/middleware"
 )
 
-func (m *MiddlewareBuilder) Build() web.Middleware {
+func (m *MiddlewareBuilder) Build() middleware.Middleware {
 	return func(next web.HandleFunc) web.HandleFunc {
-		return func(ctx *web.Context) {
+		return func(ctx *context.Context) {
 			defer func() {
 				if err := recover(); err != nil {
 					ctx.RespStatusCode = m.StatusCode
@@ -28,7 +30,7 @@ func NewBuilder() *MiddlewareBuilder {
 	return &MiddlewareBuilder{
 		StatusCode: http.StatusInternalServerError,
 		ErrMsg:     "服务器未知错误，请联系管理员!",
-		LogFunc: func(ctx *web.Context) {
+		LogFunc: func(ctx *context.Context) {
 			log.Println(string(ctx.RespData))
 		},
 	}
@@ -37,5 +39,5 @@ func NewBuilder() *MiddlewareBuilder {
 type MiddlewareBuilder struct {
 	StatusCode int
 	ErrMsg     string
-	LogFunc    func(ctx *web.Context)
+	LogFunc    func(ctx *context.Context)
 }

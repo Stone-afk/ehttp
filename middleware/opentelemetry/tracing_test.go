@@ -4,7 +4,8 @@ import (
 	"go.opentelemetry.io/otel"
 	"testing"
 	"time"
-	web "web/v7"
+	"web"
+	"web/context"
 )
 
 func TestMiddlewareBuilder_Build(t *testing.T) {
@@ -12,11 +13,11 @@ func TestMiddlewareBuilder_Build(t *testing.T) {
 	testinitZipkin(t)
 	s := web.NewHTTPServer()
 
-	s.Get("/", func(ctx *web.Context) {
+	s.Get("/", func(ctx *context.Context) {
 		ctx.Response.Write([]byte("hello, world"))
 	})
 
-	s.Get("/order", func(ctx *web.Context) {
+	s.Get("/order", func(ctx *context.Context) {
 		c, span := tracer.Start(ctx.Request.Context(), "first_layer")
 		defer span.End()
 
@@ -34,7 +35,7 @@ func TestMiddlewareBuilder_Build(t *testing.T) {
 		ctx.RespData = []byte("hello, world")
 	})
 
-	s.Get("/user", func(ctx *web.Context) {
+	s.Get("/user", func(ctx *context.Context) {
 		c, span := tracer.Start(ctx.Request.Context(), "first_layer")
 		defer span.End()
 
