@@ -1,12 +1,14 @@
 package errhdl
 
 import (
-	web "web/v8"
+	"web/context"
+	webHandler "web/handler"
+	"web/middleware"
 )
 
-func (m *MiddlewareBuilder) Build() web.Middleware {
-	return func(next web.HandleFunc) web.HandleFunc {
-		return func(ctx *web.Context) {
+func (m *MiddlewareBuilder) Build() middleware.Middleware {
+	return func(next webHandler.HandleFunc) webHandler.HandleFunc {
+		return func(ctx *context.Context) {
 			next(ctx)
 			resp, ok := m.resp[ctx.RespStatusCode]
 			if ok {
